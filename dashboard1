@@ -107,6 +107,9 @@ const FinancialSimulator = ({ onClose, currentData }) => {
   const profitDiff = projProfit - currentData.profit;
   const totalCost = projCMV + projTax + projPersonnel + projAdmin + projPartners;
   const pieData = [{ label: 'CMV', value: projCMV, color: 'bg-blue-500' }, { label: 'Pessoal', value: projPersonnel, color: 'bg-indigo-500' }, { label: 'Adm', value: projAdmin, color: 'bg-orange-500' }, { label: 'Sócios', value: projPartners, color: 'bg-purple-500' }, { label: 'Impostos', value: projTax, color: 'bg-red-500' }];
+  
+  // FIXED: Removed undefined `revenueVar` and replaced with `salesInc`
+  const revenueVar = salesInc; 
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -123,13 +126,14 @@ const FinancialSimulator = ({ onClose, currentData }) => {
            <div className="flex-1 bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-200 flex flex-col">
               <h3 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-wider">Projeção de Resultado</h3>
               <div className="space-y-4 flex-1">
-                 <div className="flex justify-between items-center py-3 border-b border-gray-100"><span className="text-gray-500 text-sm">Receita Líquida</span><div className="text-right"><span className="block font-bold text-gray-900 text-lg">{formatCurrency(projRevenue)}</span><span className={`text-[10px] font-bold ${revenueVar>=0?'text-emerald-500':'text-red-500'}`}>{revenueVar > 0 ? '+' : ''}{revenueVar}%</span></div></div>
+                 {/* FIXED: Replaced undefined revenueVar with salesInc */}
+                 <div className="flex justify-between items-center py-3 border-b border-gray-100"><span className="text-gray-500 text-sm">Receita Líquida</span><div className="text-right"><span className="block font-bold text-gray-900 text-lg">{formatCurrency(projRevenue)}</span><span className={`text-[10px] font-bold ${salesInc>=0?'text-emerald-500':'text-red-500'}`}>{salesInc > 0 ? '+' : ''}{salesInc}%</span></div></div>
                  <div className="flex justify-between items-center py-3 border-b border-gray-100"><span className="text-gray-500 text-sm">Custos Variáveis</span><div className="text-right"><span className="block font-bold text-red-500 text-lg">-{formatCurrency(projCMV + projTax)}</span></div></div>
                  <div className="flex justify-between items-center py-3 border-b border-gray-100"><span className="text-gray-500 text-sm">Custos Fixos Totais</span><div className="text-right"><span className="block font-bold text-red-500">-{formatCurrency(projPersonnel + projAdmin + projPartners)}</span></div></div>
               </div>
               <div className="mt-8 bg-slate-50 p-6 rounded-3xl border border-slate-100"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-slate-400 uppercase">Lucro Atual</span><span className={`font-bold ${currentData.profit>=0?'text-gray-700':'text-red-400 line-through'}`}>{formatCurrency(currentData.profit)}</span></div><div className="flex justify-between items-end"><div><span className="text-xs font-bold text-slate-400 uppercase">Lucro Projetado</span><h2 className={`text-4xl font-black mt-1 ${projProfit>=0?'text-emerald-500':'text-red-500'}`}>{formatCurrency(projProfit)}</h2></div><div className={`px-3 py-1 rounded-lg text-xs font-bold ${profitDiff>=0?'bg-emerald-100 text-emerald-700':'bg-red-100 text-red-700'}`}>{profitDiff>=0?'+':''}{formatCurrency(profitDiff)}</div></div>{projProfit > 0 && currentData.profit < 0 && <div className="mt-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-700 text-xs font-bold flex items-center gap-2"><CheckCircle size={14}/> Ponto de Inflexão Atingido!</div>}</div>
               <div className="h-4 w-full flex rounded-full overflow-hidden mt-4">{pieData.map((d, i) => (<div key={i} className={d.color} style={{width: `${(d.value/totalCost)*100}%`}} title={d.label}></div>))}</div>
-              <div className="flex gap-3 mt-6"><button onClick={() => {setPersonnelCut(0); setAdminCut(0); setPartnersCut(0); setSalesInc(0); setCmvOpt(0); setRevenueVar(0)}} className="px-6 py-4 rounded-xl font-bold text-gray-500 hover:bg-gray-200 bg-gray-100 transition-colors">Resetar</button><button className="flex-1 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2"><Save size={18} /> Aplicar Metas</button></div>
+              <div className="flex gap-3 mt-6"><button onClick={() => {setPersonnelCut(0); setAdminCut(0); setPartnersCut(0); setSalesInc(0); setCmvOpt(0);}} className="px-6 py-4 rounded-xl font-bold text-gray-500 hover:bg-gray-200 bg-gray-100 transition-colors">Resetar</button><button className="flex-1 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2"><Save size={18} /> Aplicar Metas</button></div>
            </div>
         </div>
       </div>
