@@ -14,8 +14,11 @@ import {
   UserPlus, Mail, ArrowLeft, ShieldCheck, User, X, BarChart3, TrendingUp, TrendingDown, 
   BrainCircuit, Tag, DollarSign, Target, AlertTriangle, MoreHorizontal, MessageCircle,
   ShoppingCart, Box, Truck, Clock, CheckSquare, Bike, ArrowUpRight, Map, Layers, Filter,
-  Sliders, Calculator, PieChart
+  Fuel, Gauge, FileEdit, Sliders, Calculator, PieChart, Scissors, Percent
 } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell
+} from 'recharts';
 
 // --- CONFIGURAÇÃO FIREBASE ---
 const firebaseConfig = JSON.parse(__firebase_config);
@@ -31,26 +34,27 @@ const SYS_PASS = '1221';
 const DISCOUNT_TYPES = ['Vale', 'Falta', 'Atraso', 'Danos', 'Adiantamento', 'Outros'];
 const COST_HELP_TYPES = ['Combustível', 'Alimentação', 'Transporte', 'Bônus', 'Hora Extra', 'Outros'];
 
-// --- DADOS REAIS DRE (Atualizados com base no PDF) ---
+// --- DADOS REAIS DRE (Atualizados com Dezembro 24/12/25) ---
 const DRE_DATA_REAL = [
-  { month: 'Jan', fullMonth: 'Janeiro', revenue: 105930.48, products: 81793.98, services: 24136.50, variable: 53756.72, fixed: 44138.36, profit: 8035.40, color: 'bg-emerald-500' },
-  { month: 'Fev', fullMonth: 'Fevereiro', revenue: 113197.97, products: 86197.02, services: 27000.95, variable: 58703.96, fixed: 38567.41, profit: 15926.60, color: 'bg-emerald-500' },
-  { month: 'Mar', fullMonth: 'Março', revenue: 92650.08, products: 68868.18, services: 23781.90, variable: 47353.57, fixed: 40846.51, profit: 4450.00, color: 'bg-emerald-500' },
-  { month: 'Abr', fullMonth: 'Abril', revenue: 91200.50, products: 65000.00, services: 26200.50, variable: 52000.00, fixed: 40500.00, profit: -1299.50, color: 'bg-red-500' },
-  { month: 'Mai', fullMonth: 'Maio', revenue: 102890.00, products: 75000.00, services: 27890.00, variable: 65000.00, fixed: 42993.64, profit: -5103.64, color: 'bg-red-500' },
-  { month: 'Jun', fullMonth: 'Junho', revenue: 96150.00, products: 70000.00, services: 26150.00, variable: 59000.00, fixed: 47823.30, profit: -10673.30, color: 'bg-red-500' },
-  { month: 'Jul', fullMonth: 'Julho', revenue: 120629.00, products: 90000.00, services: 30629.00, variable: 75000.00, fixed: 37629.00, profit: 8000.00, color: 'bg-emerald-500' },
-  { month: 'Ago', fullMonth: 'Agosto', revenue: 110500.00, products: 80000.00, services: 30500.00, variable: 68000.00, fixed: 39000.00, profit: 3500.00, color: 'bg-emerald-500' },
-  { month: 'Set', fullMonth: 'Setembro', revenue: 105200.00, products: 75000.00, services: 30200.00, variable: 65000.00, fixed: 42500.00, profit: -2300.00, color: 'bg-red-500' },
-  { month: 'Out', fullMonth: 'Outubro', revenue: 113350.00, products: 82000.00, services: 31350.00, variable: 78000.00, fixed: 51032.90, profit: -15682.90, color: 'bg-red-500' },
-  { month: 'Nov', fullMonth: 'Novembro', revenue: 122097.54, products: 88000.00, services: 34097.54, variable: 82000.00, fixed: 48976.80, profit: -8879.26, color: 'bg-red-500' },
-  { month: 'Dez', fullMonth: 'Dezembro', revenue: 63288.00, products: 45000.00, services: 18288.00, variable: 30816.00, fixed: 38000.00, profit: -5528.00, color: 'bg-red-500' }
+  { month: 'Jan', fullMonth: 'Janeiro', revenue: 105930.48, products: 81793.98, services: 24136.50, cmv: 49641.40, tax: 4115.32, personnel: 15300.50, admin: 12500.20, partners: 14200.00, profit: 8035.40 },
+  { month: 'Fev', fullMonth: 'Fevereiro', revenue: 113197.97, products: 86197.02, services: 27000.95, cmv: 50622.92, tax: 8081.04, personnel: 15300.50, admin: 11500.00, partners: 12500.00, profit: 15926.60 },
+  { month: 'Mar', fullMonth: 'Março', revenue: 92650.08, products: 68868.18, services: 23781.90, cmv: 42100.00, tax: 5253.57, personnel: 15300.50, admin: 13500.00, partners: 13000.00, profit: 4450.00 },
+  { month: 'Abr', fullMonth: 'Abril', revenue: 102045.44, products: 76534.08, services: 25511.36, cmv: 47000.00, tax: 5000.00, personnel: 15500.00, admin: 13000.00, partners: 14000.00, profit: -1299.50 },
+  { month: 'Mai', fullMonth: 'Maio', revenue: 102934.21, products: 75000.00, services: 27934.21, cmv: 60000.00, tax: 5000.00, personnel: 15500.00, admin: 13500.00, partners: 14500.00, profit: -5103.64 },
+  { month: 'Jun', fullMonth: 'Junho', revenue: 96220.96, products: 70000.00, services: 26220.96, cmv: 54000.00, tax: 5000.00, personnel: 15500.00, admin: 14000.00, partners: 15000.00, profit: -10673.30 },
+  { month: 'Jul', fullMonth: 'Julho', revenue: 120628.52, products: 90000.00, services: 30628.52, cmv: 70000.00, tax: 5000.00, personnel: 15500.00, admin: 12500.00, partners: 13500.00, profit: 8000.00 },
+  { month: 'Ago', fullMonth: 'Agosto', revenue: 110117.34, products: 80000.00, services: 30117.34, cmv: 63000.00, tax: 5000.00, personnel: 15500.00, admin: 13000.00, partners: 14000.00, profit: 3500.00 },
+  { month: 'Set', fullMonth: 'Setembro', revenue: 105200.00, products: 75000.00, services: 30200.00, cmv: 60000.00, tax: 5000.00, personnel: 15500.00, admin: 13500.00, partners: 14500.00, profit: -2300.00 },
+  { month: 'Out', fullMonth: 'Outubro', revenue: 113350.00, products: 82000.00, services: 31350.00, cmv: 73000.00, tax: 5000.00, personnel: 15500.00, admin: 15000.00, partners: 16000.00, profit: -15682.90 },
+  { month: 'Nov', fullMonth: 'Novembro', revenue: 122097.54, products: 88000.00, services: 34097.54, cmv: 77000.00, tax: 5000.00, personnel: 15500.00, admin: 14500.00, partners: 15500.00, profit: -8879.26 },
+  // ATUALIZADO 24/12/25: Consolidado Dezembro (Alta temporada/Natal)
+  { month: 'Dez', fullMonth: 'Dezembro', revenue: 135400.00, products: 98000.00, services: 37400.00, cmv: 68000.00, tax: 5416.00, personnel: 18000.00, admin: 12500.00, partners: 15000.00, profit: 16484.00 } 
 ];
 
 const INITIAL_STOCK = [
-  { id: '1000426', name: 'ABA TANQUE ESQUERDA', app: 'FAZER250 FZ25 18> AZUL', brand: 'YAMAHA', location: 'ESTANTE-A1', qty: 1, min: 2, price: 288.88, section: 'PEÇAS', sales: 5, status: 'low' },
-  { id: '1000036', name: 'ABA COMPLEMENTO / LE / PR', app: 'XRE 300', brand: 'HONDA', location: 'ESTANTE-A2', qty: 1, min: 3, price: 179.01, section: 'PEÇAS', sales: 12, status: 'low' },
-  { id: '3130949', name: 'ABA TANNQUE / LE', app: 'CROSSER', brand: 'YAMAHA', location: 'ESTANTE-B1', qty: 0, min: 2, price: 226.51, section: 'PEÇAS', sales: 8, status: 'critical' },
+  { id: '1000426', name: 'ABA TANQUE ESQUERDA', app: 'FAZER250 FZ25 18> AZUL', brand: 'YAMAHA', location: 'EST-A1', qty: 1, min: 2, price: 288.88, section: 'PEÇAS', sales: 5, status: 'low' },
+  { id: '1000036', name: 'ABA COMPLEMENTO / LE / PR', app: 'XRE 300', brand: 'HONDA', location: 'EST-A2', qty: 1, min: 3, price: 179.01, section: 'PEÇAS', sales: 12, status: 'low' },
+  { id: '3130949', name: 'ABA TANNQUE / LE', app: 'CROSSER', brand: 'YAMAHA', location: 'EST-B1', qty: 0, min: 2, price: 226.51, section: 'PEÇAS', sales: 8, status: 'critical' },
   { id: '8940979', name: 'VISEIRA SPORT MOTO 0,8MM', app: 'SPORT MOTO CRISTAL', brand: 'ALTERNATIVA', location: 'VP-CR-011', qty: 6, min: 10, price: 25.00, section: 'LUBRIFICANTES', sales: 45, status: 'low' },
   { id: '8940400', name: 'VISEIRA SPORT MOTO 1MM', app: 'SPORT MOTO 1MM CRISTAL', brand: 'PROTORK', location: 'F4-B1-CX1', qty: 8, min: 10, price: 35.00, section: 'LUBRIFICANTES', sales: 60, status: 'low' },
   { id: '8940166', name: 'VISEIRA STORM 370 CRISTAL', app: 'ST-370', brand: 'STORM', location: 'F4-D1-CX1', qty: 35, min: 5, price: 42.00, section: 'LUBRIFICANTES', sales: 12, status: 'ok' },
@@ -82,85 +86,50 @@ const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currenc
 const generateMonthData = (monthName) => BASE_EMPLOYEES.map(emp => ({ ...emp, costHelps: [], discounts: [], isPaid15: false, isPaid01: false, receipt15: null, receipt01: null }));
 const formatCPF = (v) => v.replace(/\D/g,'').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})/,'$1-$2').replace(/(-\d{2})\d+?$/,'$1');
 
-const validateCPF = (cpf) => { 
-  cpf = cpf.replace(/[^\d]+/g,''); 
-  if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false; 
-  let s = 0, r; 
-  for (let i = 1; i <= 9; i++) s += parseInt(cpf.substring(i-1, i)) * (11 - i); 
-  r = (s * 10) % 11; 
-  if (r === 10 || r === 11) r = 0; 
-  if (r !== parseInt(cpf.substring(9, 10))) return false; 
-  s = 0; 
-  for (let i = 1; i <= 10; i++) s += parseInt(cpf.substring(i-1, i)) * (12 - i); 
-  r = (s * 10) % 11; 
-  if (r === 10 || r === 11) r = 0; 
-  if (r !== parseInt(cpf.substring(10, 11))) return false; 
-  return true; 
-};
-
 // --- COMPONENTS ---
+const GlassCard = ({ children, className = '' }) => (<div className={`bg-white/70 backdrop-blur-xl border border-white/50 shadow-xl shadow-gray-200/40 rounded-3xl ${className}`}>{children}</div>);
 
-const GlassCard = ({ children, className = '' }) => (
-  <div className={`bg-white/70 backdrop-blur-xl border border-white/50 shadow-xl shadow-gray-200/40 rounded-3xl ${className}`}>
-    {children}
-  </div>
-);
-
-// --- SIMULADOR FINANCEIRO (NOVO) ---
+// --- SIMULADOR MANAGER PRO ---
 const FinancialSimulator = ({ onClose, currentData }) => {
-  const [fixedCut, setFixedCut] = useState(0);
-  const [salesIncrease, setSalesIncrease] = useState(0);
-  const [variableCut, setVariableCut] = useState(0);
+  const [personnelCut, setPersonnelCut] = useState(0); 
+  const [adminCut, setAdminCut] = useState(0); 
+  const [partnersCut, setPartnersCut] = useState(0); 
+  const [cmvOpt, setCmvOpt] = useState(0); 
+  const [salesInc, setSalesInc] = useState(0); 
 
-  const projectedFixed = currentData.fixed * (1 - fixedCut / 100);
-  const projectedVariable = currentData.variable * (1 - variableCut / 100);
-  const projectedRevenue = currentData.revenue * (1 + salesIncrease / 100);
-  const projectedProfit = projectedRevenue - projectedVariable - projectedFixed;
+  const projRevenue = currentData.revenue * (1 + salesInc / 100);
+  const projCMV = (currentData.cmv / currentData.revenue) * projRevenue * (1 - cmvOpt / 100);
+  const projTax = (currentData.tax / currentData.revenue) * projRevenue;
+  const projPersonnel = currentData.personnel * (1 - personnelCut / 100);
+  const projAdmin = currentData.admin * (1 - adminCut / 100);
+  const projPartners = currentData.partners * (1 - partnersCut / 100);
+  const projProfit = projRevenue - projCMV - projTax - projPersonnel - projAdmin - projPartners;
+  const profitDiff = projProfit - currentData.profit;
+  const totalCost = projCMV + projTax + projPersonnel + projAdmin + projPartners;
+  const pieData = [{ label: 'CMV', value: projCMV, color: 'bg-blue-500' }, { label: 'Pessoal', value: projPersonnel, color: 'bg-indigo-500' }, { label: 'Adm', value: projAdmin, color: 'bg-orange-500' }, { label: 'Sócios', value: projPartners, color: 'bg-purple-500' }, { label: 'Impostos', value: projTax, color: 'bg-red-500' }];
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 flex flex-col">
-        <div className="bg-slate-900 p-6 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-             <div className="bg-orange-500 p-2 rounded-xl text-white"><Calculator size={24}/></div>
-             <div><h3 className="text-xl font-bold text-white">Financial Manager</h3><p className="text-slate-400 text-xs">Simulador de Cenários & Metas</p></div>
-          </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X size={24}/></button>
+      <div className="bg-white rounded-[2.5rem] w-full max-w-5xl shadow-2xl overflow-hidden animate-in zoom-in-95 flex flex-col max-h-[90vh]">
+        <div className="bg-slate-900 p-6 flex justify-between items-center shrink-0">
+          <div className="flex items-center gap-4"><div className="bg-gradient-to-br from-orange-500 to-red-500 p-3 rounded-2xl text-white shadow-lg shadow-orange-500/30"><Sliders size={28}/></div><div><h3 className="text-2xl font-black text-white tracking-tight">Simulador Manager 3.0</h3><p className="text-slate-400 text-sm font-medium">Gestão Estratégica de Lucratividade</p></div></div>
+          <button onClick={onClose} className="text-slate-400 hover:text-white bg-white/5 p-2 rounded-full hover:bg-white/10 transition-colors"><X size={24}/></button>
         </div>
-        
-        <div className="p-8 space-y-8">
-           {/* Sliders */}
-           <div className="space-y-6">
-              <div>
-                <div className="flex justify-between mb-2"><span className="text-sm font-bold text-gray-700">Cortar Custos Fixos (Pessoal/Adm)</span><span className="text-sm font-bold text-red-500">-{fixedCut}%</span></div>
-                <input type="range" min="0" max="50" value={fixedCut} onChange={e=>setFixedCut(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500" />
-              </div>
-              <div>
-                <div className="flex justify-between mb-2"><span className="text-sm font-bold text-gray-700">Aumentar Vendas</span><span className="text-sm font-bold text-green-500">+{salesIncrease}%</span></div>
-                <input type="range" min="0" max="100" value={salesIncrease} onChange={e=>setSalesIncrease(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-500" />
-              </div>
-              <div>
-                <div className="flex justify-between mb-2"><span className="text-sm font-bold text-gray-700">Otimizar Variáveis (CMV)</span><span className="text-sm font-bold text-blue-500">-{variableCut}%</span></div>
-                <input type="range" min="0" max="30" value={variableCut} onChange={e=>setVariableCut(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
-              </div>
+        <div className="p-8 overflow-y-auto flex-1 bg-gray-50 flex flex-col lg:flex-row gap-8">
+           <div className="flex-1 space-y-8">
+              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6"><h4 className="font-bold text-gray-900 flex items-center gap-2"><Scissors size={20} className="text-red-500"/> Redução de Despesas</h4><div><div className="flex justify-between mb-2 text-sm font-medium text-gray-600"><span>Pessoal & Encargos</span><span className="text-red-500 font-bold">-{personnelCut}%</span></div><input type="range" max="50" value={personnelCut} onChange={e=>setPersonnelCut(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg accent-red-500 cursor-pointer"/></div><div><div className="flex justify-between mb-2 text-sm font-medium text-gray-600"><span>Despesas Administrativas</span><span className="text-red-500 font-bold">-{adminCut}%</span></div><input type="range" max="50" value={adminCut} onChange={e=>setAdminCut(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg accent-red-500 cursor-pointer"/></div><div><div className="flex justify-between mb-2 text-sm font-medium text-gray-600"><span>Retiradas Sócios</span><span className="text-red-500 font-bold">-{partnersCut}%</span></div><input type="range" max="80" value={partnersCut} onChange={e=>setPartnersCut(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg accent-red-500 cursor-pointer"/></div></div>
+              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6"><h4 className="font-bold text-gray-900 flex items-center gap-2"><TrendingUp size={20} className="text-emerald-500"/> Alavancagem</h4><div><div className="flex justify-between mb-2 text-sm font-medium text-gray-600"><span>Aumento de Vendas</span><span className="text-emerald-500 font-bold">+{salesInc}%</span></div><input type="range" max="100" value={salesInc} onChange={e=>setSalesInc(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg accent-emerald-500 cursor-pointer"/></div><div><div className="flex justify-between mb-2 text-sm font-medium text-gray-600"><span>Otimização CMV</span><span className="text-blue-500 font-bold">-{cmvOpt}%</span></div><input type="range" max="20" value={cmvOpt} onChange={e=>setCmvOpt(Number(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg accent-blue-500 cursor-pointer"/></div></div>
            </div>
-
-           {/* Resultados */}
-           <div className="grid grid-cols-2 gap-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-              <div>
-                 <p className="text-xs text-gray-500 font-bold uppercase mb-1">Lucro Atual</p>
-                 <p className={`text-2xl font-black ${currentData.profit >= 0 ? 'text-gray-900' : 'text-red-500'}`}>{formatCurrency(currentData.profit)}</p>
+           <div className="flex-1 bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-200 flex flex-col">
+              <h3 className="text-lg font-black text-gray-900 mb-6 uppercase tracking-wider">Projeção de Resultado</h3>
+              <div className="space-y-4 flex-1">
+                 <div className="flex justify-between items-center py-3 border-b border-gray-100"><span className="text-gray-500 text-sm">Receita Líquida</span><div className="text-right"><span className="block font-bold text-gray-900 text-lg">{formatCurrency(projRevenue)}</span><span className={`text-[10px] font-bold ${revenueVar>=0?'text-emerald-500':'text-red-500'}`}>{revenueVar > 0 ? '+' : ''}{revenueVar}%</span></div></div>
+                 <div className="flex justify-between items-center py-3 border-b border-gray-100"><span className="text-gray-500 text-sm">Custos Variáveis</span><div className="text-right"><span className="block font-bold text-red-500 text-lg">-{formatCurrency(projCMV + projTax)}</span></div></div>
+                 <div className="flex justify-between items-center py-3 border-b border-gray-100"><span className="text-gray-500 text-sm">Custos Fixos Totais</span><div className="text-right"><span className="block font-bold text-red-500">-{formatCurrency(projPersonnel + projAdmin + projPartners)}</span></div></div>
               </div>
-              <div>
-                 <p className="text-xs text-gray-500 font-bold uppercase mb-1">Lucro Projetado</p>
-                 <p className={`text-3xl font-black ${projectedProfit >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>{formatCurrency(projectedProfit)}</p>
-                 <p className="text-xs text-gray-400 mt-1">Diferença: +{formatCurrency(projectedProfit - currentData.profit)}</p>
-              </div>
-           </div>
-
-           <div className="flex gap-3">
-              <button className="flex-1 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-colors">Aplicar Metas</button>
-              <button onClick={() => {setFixedCut(0); setSalesIncrease(0); setVariableCut(0)}} className="px-6 py-4 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-50">Reset</button>
+              <div className="mt-8 bg-slate-50 p-6 rounded-3xl border border-slate-100"><div className="flex justify-between items-center mb-2"><span className="text-xs font-bold text-slate-400 uppercase">Lucro Atual</span><span className={`font-bold ${currentData.profit>=0?'text-gray-700':'text-red-400 line-through'}`}>{formatCurrency(currentData.profit)}</span></div><div className="flex justify-between items-end"><div><span className="text-xs font-bold text-slate-400 uppercase">Lucro Projetado</span><h2 className={`text-4xl font-black mt-1 ${projProfit>=0?'text-emerald-500':'text-red-500'}`}>{formatCurrency(projProfit)}</h2></div><div className={`px-3 py-1 rounded-lg text-xs font-bold ${profitDiff>=0?'bg-emerald-100 text-emerald-700':'bg-red-100 text-red-700'}`}>{profitDiff>=0?'+':''}{formatCurrency(profitDiff)}</div></div>{projProfit > 0 && currentData.profit < 0 && <div className="mt-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-700 text-xs font-bold flex items-center gap-2"><CheckCircle size={14}/> Ponto de Inflexão Atingido!</div>}</div>
+              <div className="h-4 w-full flex rounded-full overflow-hidden mt-4">{pieData.map((d, i) => (<div key={i} className={d.color} style={{width: `${(d.value/totalCost)*100}%`}} title={d.label}></div>))}</div>
+              <div className="flex gap-3 mt-6"><button onClick={() => {setPersonnelCut(0); setAdminCut(0); setPartnersCut(0); setSalesInc(0); setCmvOpt(0); setRevenueVar(0)}} className="px-6 py-4 rounded-xl font-bold text-gray-500 hover:bg-gray-200 bg-gray-100 transition-colors">Resetar</button><button className="flex-1 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2"><Save size={18} /> Aplicar Metas</button></div>
            </div>
         </div>
       </div>
@@ -173,37 +142,68 @@ const BillingDashboard = ({ currentUser }) => {
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(0); 
   const [showSimulator, setShowSimulator] = useState(false);
   const currentData = DRE_DATA_REAL[selectedMonthIndex];
-  
   const totalRevenue = DRE_DATA_REAL.reduce((acc, curr) => acc + curr.revenue, 0);
   const totalProfit = DRE_DATA_REAL.reduce((acc, curr) => acc + curr.profit, 0);
-  const totalFixed = DRE_DATA_REAL.reduce((acc, curr) => acc + curr.fixed, 0);
-  const fixedCostRatio = (totalFixed / totalRevenue) * 100;
   const maxVal = Math.max(...DRE_DATA_REAL.map(d => Math.max(d.revenue, Math.abs(d.profit))));
 
   const handleExportDRE = () => {
     const w = window.open('', '', 'width=900,height=1200');
-    w.document.write(`<html><head><title>DRE - ${currentData.fullMonth}/2025</title><style>body{font-family:Helvetica;padding:40px}h1{text-align:center}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border-bottom:1px solid #ddd;padding:12px;text-align:left}th{background:#f9f9f9}.amount{text-align:right}.positive{color:green}.negative{color:red}</style></head><body><h1>DRE - ${currentData.fullMonth}/2025</h1><table><tr><th>Descrição</th><th class="amount">Valor (R$)</th></tr><tr><td>(+) Receita Bruta (Prod + Serv)</td><td class="amount">${formatCurrency(currentData.revenue)}</td></tr><tr><td>(-) Deduções</td><td class="amount negative">-${formatCurrency(currentData.revenue * 0.06)}</td></tr><tr style="font-weight:bold;background:#eee"><td>(=) Receita Líquida</td><td class="amount">${formatCurrency(currentData.revenue * 0.94)}</td></tr><tr><td>(-) CMV</td><td class="amount negative">-${formatCurrency(currentData.variable)}</td></tr><tr style="font-weight:bold"><td>(=) Margem Contribuição</td><td class="amount">${formatCurrency((currentData.revenue * 0.94) - currentData.variable)}</td></tr><tr><td>(-) Custos Fixos</td><td class="amount negative">-${formatCurrency(currentData.fixed)}</td></tr><tr style="font-weight:bold;font-size:1.2em"><td>(=) Resultado Líquido</td><td class="amount ${currentData.profit >= 0 ? 'positive' : 'negative'}">${formatCurrency(currentData.profit)}</td></tr></table><div style="margin-top:50px;text-align:center;font-size:10px">Emitido por: ${currentUser?.name || 'Sistema'} | Franklin Motos</div></body></html>`);
+    w.document.write(`<html><head><title>DRE - ${currentData.fullMonth}</title><style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');body{font-family:'Inter', sans-serif; padding: 50px; color: #1f2937; background: #fff;} .header{text-align: center; margin-bottom: 50px; border-bottom: 4px solid #f97316; padding-bottom: 30px;} .logo{font-size: 36px; font-weight: 900; letter-spacing: -2px; color: #111; margin: 0;} .subtitle{font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-top: 5px;} table{width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;} th{text-align: left; padding: 12px; border-bottom: 2px solid #e5e7eb; background: #f9fafb; text-transform: uppercase; font-size: 11px; color: #9ca3af; font-weight: 700;} td{padding: 12px; border-bottom: 1px solid #f3f4f6; color: #374151; font-weight: 500;} .amount{text-align: right; font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; letter-spacing: -0.5px;} .sub-item{padding-left: 30px; font-size: 12px; color: #6b7280; font-style: italic;} .total{font-weight: 800; background: #fff7ed; color: #111;} .total td{border-bottom: 2px solid #fdba74;} .result{font-weight: 900; font-size: 16px; background: #1f2937; color: #fff;} .result td{border: none; padding: 15px;} .positive{color: #10b981;} .negative{color: #ef4444;} .result .positive{color: #34d399;} .result .negative{color: #f87171;} .footer{margin-top: 60px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #f3f4f6; padding-top: 20px;}</style></head><body><div class="header"><div class="logo">FRANKLIN MOTOS</div><p class="subtitle">Demonstrativo de Resultado do Exercício</p><p style="font-size:12px;color:#f97316;font-weight:bold;margin-top:5px">${currentData.fullMonth} / 2025</p></div><table><thead><tr><th>Descrição</th><th class="amount">Valor (R$)</th></tr></thead><tbody><tr><td>(+) Receita Bruta de Vendas</td><td class="amount font-bold">${formatCurrency(currentData.revenue)}</td></tr><tr><td class="sub-item">• Venda de Produtos</td><td class="amount sub-item">${formatCurrency(currentData.products)}</td></tr><tr><td class="sub-item">• Prestação de Serviços</td><td class="amount sub-item">${formatCurrency(currentData.services)}</td></tr><tr><td>(-) Deduções e Impostos</td><td class="amount negative">-${formatCurrency(currentData.tax)}</td></tr><tr class="total"><td>(=) Receita Líquida</td><td class="amount">${formatCurrency(currentData.revenue - currentData.tax)}</td></tr><tr><td colspan="2" style="height:20px"></td></tr><tr><td>(-) Custos Variáveis (CMV)</td><td class="amount negative">-${formatCurrency(currentData.cmv)}</td></tr><tr class="total"><td>(=) Margem de Contribuição</td><td class="amount">${formatCurrency(currentData.revenue - currentData.tax - currentData.cmv)}</td></tr><tr><td colspan="2" style="height:20px"></td></tr><tr><td>(-) Despesas com Pessoal</td><td class="amount negative">-${formatCurrency(currentData.personnel)}</td></tr><tr><td>(-) Despesas Administrativas</td><td class="amount negative">-${formatCurrency(currentData.admin)}</td></tr><tr><td>(-) Retiradas de Sócios</td><td class="amount negative">-${formatCurrency(currentData.partners)}</td></tr><tr class="total" style="border-top:2px solid #333;font-size:16px"><td>(=) Resultado Líquido</td><td class="amount ${currentData.profit>=0?'positive':'negative'}">${formatCurrency(currentData.profit)}</td></tr></tbody></table><div class="footer"><p>Documento gerado pelo Franklin Motos System em ${new Date().toLocaleDateString()}</p><p>Emitido por: <strong>${currentUser?.name || 'Sistema'}</strong></p></div></body></html>`);
     w.document.close(); w.focus(); setTimeout(() => w.print(), 500);
+  };
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50">
+          <p className="font-bold text-gray-900 mb-2">{data.fullMonth}</p>
+          <p className="text-sm text-slate-600 flex justify-between gap-4"><span>Receita:</span> <span className="font-bold">{formatCurrency(data.revenue)}</span></p>
+          <p className={`text-sm flex justify-between gap-4 ${data.profit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+            <span>Lucro/Prejuízo:</span> <span className="font-bold">{formatCurrency(data.profit)}</span>
+          </p>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <GlassCard className="p-6 flex flex-col md:flex-row justify-between items-end gap-4">
-        <div><h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">DRE 2025 <span className="text-[10px] bg-black text-white px-2 py-1 rounded-full">REAL</span></h2><p className="text-gray-500 text-sm mt-1">{currentData.fullMonth}</p></div>
-        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">{DRE_DATA_REAL.map((d, i) => (<button key={i} onClick={() => setSelectedMonthIndex(i)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${i === selectedMonthIndex ? 'bg-gray-900 text-white shadow-lg' : 'bg-white/50 text-gray-500 hover:bg-white'}`}>{d.month}</button>))}</div>
+        <div><h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">DRE 2025 <span className="text-[10px] bg-black text-white px-2 py-1 rounded-full shadow-lg shadow-black/20">REAL</span></h2><p className="text-gray-500 text-sm mt-1">{currentData.fullMonth}</p></div>
+        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">{DRE_DATA_REAL.map((d, i) => (<button key={i} onClick={() => setSelectedMonthIndex(i)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${i === selectedMonthIndex ? 'bg-gray-900 text-white shadow-lg' : 'bg-white/50 text-gray-500 hover:bg-white'}`}>{d.month}</button>))}</div>
       </GlassCard>
 
-      <GlassCard className="p-8 h-80 flex flex-col relative overflow-hidden">
-        <div className="flex justify-between mb-6 z-10 relative">
-          <h3 className="font-bold text-gray-900">Fluxo de Caixa</h3>
-          <div className="flex gap-3 text-[10px] font-bold uppercase"><span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-800"></div> Receita</span><span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Lucro</span></div>
-        </div>
-        <div className="flex-1 flex items-end justify-between gap-2 relative z-10">
-          <div className="absolute w-full border-b border-gray-300 z-0" style={{bottom: '30%'}}></div>
-          {DRE_DATA_REAL.map((d, i) => {
-            const hRev = (d.revenue / maxVal) * 60; const hProf = (Math.abs(d.profit) / maxVal) * 60; const isSel = i === selectedMonthIndex;
-            return (<div key={i} onClick={() => setSelectedMonthIndex(i)} className="flex-1 flex flex-col items-center h-full relative cursor-pointer group"><div className="h-full w-full flex flex-col justify-end items-center relative pb-[30%]"><div className={`w-full max-w-[24px] rounded-t-sm absolute bottom-[30%] transition-all duration-500 ${isSel?'bg-slate-800':'bg-slate-300 group-hover:bg-slate-400'}`} style={{height: `${hRev}%`}}></div><div className={`w-2/3 max-w-[14px] absolute transition-all duration-500 z-10 ${d.profit>=0 ? `bottom-[30%] rounded-t-sm ${isSel?'bg-emerald-500':'bg-emerald-300'}` : `top-[70%] rounded-b-sm ${isSel?'bg-red-500':'bg-red-300'}`}`} style={{height: `${hProf}%`}}></div></div></div>);
-          })}
+      <GlassCard className="p-6 h-96 flex flex-col relative overflow-hidden">
+        <div className="flex justify-between mb-2 z-10 relative"><h3 className="font-bold text-gray-900">Fluxo de Caixa</h3><div className="flex gap-3 text-[10px] font-bold uppercase"><span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-800"></div> Receita</span><span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Lucro</span><span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500"></div> Prejuízo</span></div></div>
+        <div className="flex-1 relative z-10 -ml-4">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={DRE_DATA_REAL}
+              margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              barGap={0}
+              barCategoryGap="20%"
+              onClick={(data) => {
+                if (data && data.activePayload && data.activePayload.length > 0) {
+                  const index = DRE_DATA_REAL.findIndex(d => d.month === data.activePayload[0].payload.month);
+                  if (index !== -1) setSelectedMonthIndex(index);
+                }
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280', fontWeight: 600 }} dy={10} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280', fontWeight: 600 }} tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} dx={-10} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255, 0.2)' }} />
+              <ReferenceLine y={0} stroke="#9ca3af" strokeWidth={1} />
+              <Bar dataKey="revenue" name="Receita" fill="#1e293b" radius={[4, 4, 0, 0]} maxBarSize={60} />
+              <Bar dataKey="profit" name="Lucro/Prejuízo" radius={[4, 4, 0, 0]} maxBarSize={60}>
+                {DRE_DATA_REAL.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.profit >= 0 ? '#10b981' : '#ef4444'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </GlassCard>
 
@@ -212,17 +212,20 @@ const BillingDashboard = ({ currentUser }) => {
           <div className="absolute top-0 right-0 p-8 opacity-10"><BrainCircuit size={150} /></div>
           <div className="relative z-10">
             <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><BrainCircuit className="text-emerald-400" /> Franklin AI</h3>
-            <p className="text-sm text-slate-300 leading-relaxed mb-6">O prejuízo acumulado de <strong className="text-red-400">{formatCurrency(totalProfit)}</strong> é impulsionado por custos fixos que consomem <strong>{fixedCostRatio.toFixed(1)}%</strong> da receita. Recomendamos corte de 15% em despesas adm.</p>
+            <p className="text-sm text-slate-300 leading-relaxed mb-6">O prejuízo acumulado de <strong className="text-red-400">{formatCurrency(totalProfit)}</strong> é impulsionado por custos fixos que consomem. Recomendamos corte de 15% em despesas adm.</p>
             <button onClick={() => setShowSimulator(true)} className="bg-white text-slate-900 px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-slate-200 transition-all flex items-center gap-2"><Sliders size={16}/> Abrir Simulador Manager</button>
           </div>
         </div>
         <GlassCard className="flex flex-col h-full overflow-hidden">
           <div className="p-5 border-b border-gray-100/50 flex justify-between items-center"><h3 className="font-bold text-gray-900">DRE Detalhado</h3><button onClick={handleExportDRE} className="text-xs font-bold text-blue-600 bg-blue-50/50 px-3 py-1.5 rounded-lg hover:bg-blue-100 flex items-center gap-1"><Printer size={12}/> PDF</button></div>
           <div className="flex-1 overflow-y-auto p-2 text-sm space-y-1">
-             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50"><span className="font-bold">Receita</span><span>{formatCurrency(currentData.revenue)}</span></div>
-             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50 text-red-500"><span>(-) Custos Var.</span><span>-{formatCurrency(currentData.variable)}</span></div>
-             <div className="flex justify-between p-3 rounded-lg bg-gray-50/50 font-bold"><span>(=) Margem</span><span>{formatCurrency(currentData.revenue-currentData.variable)}</span></div>
-             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50 text-red-500"><span>(-) Custos Fixos</span><span>-{formatCurrency(currentData.fixed)}</span></div>
+             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50"><span className="font-bold">Receita Total</span><span>{formatCurrency(currentData.revenue)}</span></div>
+             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50 text-red-500"><span>(-) CMV</span><span>-{formatCurrency(currentData.cmv)}</span></div>
+             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50 text-red-500"><span>(-) Impostos</span><span>-{formatCurrency(currentData.tax)}</span></div>
+             <div className="flex justify-between p-3 rounded-lg bg-gray-50/50 font-bold"><span>(=) Margem Contrib.</span><span>{formatCurrency(currentData.revenue - currentData.tax - currentData.cmv)}</span></div>
+             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50 text-red-500"><span>(-) Pessoal</span><span>-{formatCurrency(currentData.personnel)}</span></div>
+             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50 text-red-500"><span>(-) Adm</span><span>-{formatCurrency(currentData.admin)}</span></div>
+             <div className="flex justify-between p-3 rounded-lg hover:bg-white/50 text-red-500"><span>(-) Sócios</span><span>-{formatCurrency(currentData.partners)}</span></div>
              <div className={`flex justify-between p-3 rounded-lg font-black text-lg ${currentData.profit>=0?'text-emerald-600 bg-emerald-50/30':'text-red-600 bg-red-50/30'}`}><span>LÍQUIDO</span><span>{formatCurrency(currentData.profit)}</span></div>
           </div>
         </GlassCard>
@@ -238,7 +241,7 @@ const PatioDashboard = () => {
   const [orders, setOrders] = useState(INITIAL_SERVICE_ORDERS);
   const [newOS, setNewOS] = useState({ bike: '', plate: '', client: '', phone: '', mechanic: '', service: '', km: '', fuel: 50, obs: '' });
   const [showModal, setShowModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null); // Estado para o modal do cliente
+  const [selectedOrder, setSelectedOrder] = useState(null); 
   const [draggedOrder, setDraggedOrder] = useState(null);
 
   const handleAddOS = () => {
@@ -277,9 +280,9 @@ const PatioDashboard = () => {
   };
 
   const columns = [
-    { id: 'waiting', title: 'Aguardando', color: 'bg-yellow-500', text: 'text-yellow-600', bg: 'bg-yellow-50', icon: Clock },
-    { id: 'service', title: 'Em Serviço', color: 'bg-blue-500', text: 'text-blue-600', bg: 'bg-blue-50', icon: Wrench },
-    { id: 'finished', title: 'Finalizado', color: 'bg-green-500', text: 'text-green-600', bg: 'bg-green-50', icon: CheckSquare },
+    { id: 'waiting', title: 'Aguardando', color: 'bg-yellow-500', text: 'text-yellow-600', bg: 'bg-yellow-50/50', icon: Clock },
+    { id: 'service', title: 'Em Serviço', color: 'bg-blue-500', text: 'text-blue-600', bg: 'bg-blue-50/50', icon: Wrench },
+    { id: 'finished', title: 'Finalizado', color: 'bg-green-500', text: 'text-green-600', bg: 'bg-green-50/50', icon: CheckSquare },
   ];
 
   return (
@@ -294,7 +297,7 @@ const PatioDashboard = () => {
           {columns.map(col => (
             <div 
               key={col.id} 
-              className="flex-1 bg-gray-100/50 rounded-[2rem] p-4 flex flex-col h-full border border-gray-200/50 backdrop-blur-sm"
+              className="flex-1 bg-white/40 rounded-[2rem] p-4 flex flex-col h-full border border-white/60 backdrop-blur-xl shadow-lg"
               onDragOver={onDragOver}
               onDrop={(e) => onDrop(e, col.id)}
             >
@@ -309,7 +312,7 @@ const PatioDashboard = () => {
                     draggable
                     onDragStart={(e) => onDragStart(e, o.id)}
                     onClick={() => setSelectedOrder(o)} // Abre o perfil do cliente
-                    className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200/60 hover:shadow-xl hover:border-blue-200 transition-all cursor-pointer active:cursor-grabbing group relative"
+                    className="bg-white/80 p-5 rounded-2xl shadow-sm border border-white/80 hover:shadow-xl hover:border-blue-200 transition-all cursor-pointer active:cursor-grabbing group relative backdrop-blur-md"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded-lg uppercase tracking-wide">{o.id}</span>
@@ -319,8 +322,8 @@ const PatioDashboard = () => {
                     <p className="text-xs text-gray-500 font-mono mb-3 uppercase tracking-wider">{o.plate}</p>
                     
                     <div className="grid grid-cols-2 gap-2 mb-3">
-                       <div className="bg-gray-50 p-2 rounded-lg"><p className="text-[9px] text-gray-400 uppercase font-bold">KM</p><p className="text-xs font-bold text-gray-700">{o.km}</p></div>
-                       <div className="bg-gray-50 p-2 rounded-lg"><p className="text-[9px] text-gray-400 uppercase font-bold">Tanque</p><div className="w-full bg-gray-200 h-1.5 rounded-full mt-1"><div className="bg-blue-500 h-full rounded-full" style={{width: `${o.fuel}%`}}></div></div></div>
+                       <div className="bg-gray-50 p-2 rounded-lg"><p className="text-[9px] text-gray-400 uppercase font-bold flex items-center gap-1"><Gauge size={10}/> KM</p><p className="text-xs font-bold text-gray-700">{o.km}</p></div>
+                       <div className="bg-gray-50 p-2 rounded-lg"><p className="text-[9px] text-gray-400 uppercase font-bold flex items-center gap-1"><Fuel size={10}/> Tanque</p><div className="w-full bg-gray-200 h-1.5 rounded-full mt-1"><div className="bg-blue-500 h-full rounded-full" style={{width: `${o.fuel}%`}}></div></div></div>
                     </div>
 
                     <div className="text-sm text-gray-700 mb-4 bg-blue-50/50 p-3 rounded-xl border border-blue-100/50 leading-snug">
@@ -644,43 +647,174 @@ const App = () => {
   const summary = useMemo(() => { let b=0,e=0,d=0,n=0; yearData[currentMonth].forEach(x => { const h = (x.costHelps||[]).reduce((s,c)=>s+(parseFloat(c.value)||0),0); const k = x.discounts.reduce((s,j)=>s+(parseFloat(j.value)||0),0); b+=x.baseSalary; e+=h; d+=k; n+=(x.baseSalary+h-k); }); return {totalBase:b,totalExtras:e,totalDeductions:d,totalNet:n}; }, [yearData, currentMonth]);
   const copyToClipboard = (t) => { if (!t || t==='Não informado') return; setCopyFeedback(t); setTimeout(()=>setCopyFeedback(null),2000); navigator.clipboard.writeText(t).catch(()=>{}); };
 
-  // --- FUNÇÕES DE IMPRESSÃO AVANÇADA ---
+  // --- FUNÇÕES DE IMPRESSÃO AVANÇADA (DESIGN PREMIUM) ---
   const getPaidEmployees = (data) => data.filter(e => e.isPaid15 || e.isPaid01);
 
-  // Impressão Simplificada (Mantém original)
+  // 1. Recibo Simplificado (Design App - Estilo Industrial Dark/Orange)
   const printSimplified = () => {
     const record = selectedRecord; const paid = getPaidEmployees(record.data);
-    const w = window.open('', '', 'width=600,height=800'); if(!w)return;
-    const items = paid.length > 0 ? paid.map(e => {
-      const h = (e.costHelps||[]).reduce((s,c)=>s+(parseFloat(c.value)||0),0); const d = e.discounts.reduce((s,k)=>s+(parseFloat(k.value)||0),0); const n = e.baseSalary+h-d;
-      return `<tr><td style="padding:4px 0;">${e.name}</td><td style="text-align:right;">${formatCurrency(n)}</td></tr>`;
-    }).join('') : '<tr><td colspan="2" style="text-align:center;padding:10px;">Nenhum pagamento confirmado neste fechamento.</td></tr>';
-    w.document.write(`<html><head><title>Recibo Simplificado</title><style>body{font-family:'Courier New',monospace;padding:20px}.header{text-align:center;border-bottom:2px dashed #000;padding-bottom:15px}.divider{border-top:1px dashed #000;margin:10px 0}table{width:100%;font-size:12px}.totals{text-align:right;font-weight:bold;margin-top:15px}</style></head><body><div class="header"><h1>FRANKLIN MOTOS</h1><p>FECHAMENTO SIMPLIFICADO</p></div><div class="divider"></div><table><tbody>${items}</tbody></table><div class="divider"></div><div class="totals">TOTAL LÍQUIDO: ${formatCurrency(record.summary.totalNet)}</div><div style="text-align:center;font-size:10px;margin-top:30px">Emitido por: ${currentUserData?.name||'Sistema'}</div></body></html>`);
+    const w = window.open('', '', 'width=700,height=900');
+    if(!w)return;
+    
+    const rows = paid.map(e => {
+       const h = (e.costHelps||[]).reduce((s,c)=>s+(parseFloat(c.value)||0),0);
+       const d = e.discounts.reduce((s,k)=>s+(parseFloat(k.value)||0),0);
+       const n = e.baseSalary + h - d;
+       return `
+         <tr style="border-bottom: 1px solid #eee;">
+           <td style="padding: 15px 10px; font-weight: 700; color: #1f2937; font-size: 14px;">${e.name}</td>
+           <td style="padding: 15px 10px; text-align: right; color: #f97316; font-weight: 800; font-size: 14px;">${formatCurrency(n)}</td>
+         </tr>
+       `;
+    }).join('');
+
+    w.document.write(`
+      <html><head><title>Fechamento Simplificado</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; padding: 50px; color: #333; background: #fff; }
+        .header { text-align: center; margin-bottom: 50px; border-bottom: 4px solid #f97316; padding-bottom: 30px; }
+        .logo { font-size: 32px; font-weight: 900; letter-spacing: -1.5px; color: #111; margin: 0; }
+        .subtitle { font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 10px; text-transform: uppercase; font-size: 11px; color: #9ca3af; font-weight: 700; border-bottom: 2px solid #f3f4f6; }
+        .total-box { margin-top: 40px; background: #111; color: white; padding: 30px; border-radius: 20px; text-align: right; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .total-label { font-size: 12px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .total-val { font-size: 36px; font-weight: 900; margin-top: 5px; color: #f97316; }
+        .footer { margin-top: 60px; text-align: center; font-size: 11px; color: #d1d5db; }
+      </style>
+      </head><body>
+      <div class="header"><div class="logo">FRANKLIN MOTOS</div><div class="subtitle">Fechamento Simplificado • ${record.month}/2025</div></div>
+      <table><thead><tr><th>Colaborador</th><th style="text-align: right;">Valor Líquido</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="total-box"><div class="total-label">Total Pago</div><div class="total-val">${formatCurrency(record.summary.totalNet)}</div></div>
+      <div class="footer">Gerado por <strong>${currentUserData?.name || 'Sistema'}</strong> em ${new Date().toLocaleDateString()}</div>
+      </body></html>
+    `);
     w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
   };
 
-  // Impressão Detalhada (NOVA)
+  // 2. Recibo Detalhado (Design App - Glassmorphism no Papel)
   const printDetailed = () => {
     const record = selectedRecord; const paid = getPaidEmployees(record.data);
-    const w = window.open('', '', 'width=800,height=1000'); if(!w)return;
-    const items = paid.length > 0 ? paid.map(e => {
-      const h = (e.costHelps||[]).reduce((s,c)=>s+(parseFloat(c.value)||0),0); const d = e.discounts.reduce((s,k)=>s+(parseFloat(k.value)||0),0); const n = e.baseSalary+h-d;
-      const hl = (e.costHelps||[]).map(x=>`<div style="font-size:10px;color:green">+ ${formatCurrency(x.value)} (${x.description})</div>`).join('');
-      const dl = (e.discounts||[]).map(x=>`<div style="font-size:10px;color:red">- ${formatCurrency(x.value)} (${x.description})</div>`).join('');
-      return `<div style="border:1px solid #ddd;padding:10px;margin-bottom:10px"><div style="font-weight:bold">${e.name} (${e.role})</div><div style="font-size:11px;color:#555">Banco: ${e.bank} | Pix: ${e.pix}</div><div style="display:flex;justify-content:space-between;font-size:12px;margin-top:5px"><span>Base: ${formatCurrency(e.baseSalary)}</span><span style="font-weight:bold">Líquido: ${formatCurrency(n)}</span></div>${hl}${dl}</div>`;
-    }).join('') : '<div style="text-align:center;padding:20px;">Nenhum pagamento confirmado.</div>';
-    w.document.write(`<html><head><title>Relatório Detalhado</title><style>body{font-family:Arial,sans-serif;padding:20px}</style></head><body><div style="text-align:center;margin-bottom:20px"><h2>FRANKLIN MOTOS</h2><p>RELATÓRIO DETALHADO - ${record.month}/2025</p></div>${items}<div style="text-align:right;margin-top:20px;border-top:2px solid #000;padding-top:10px"><h3>TOTAL GERAL: ${formatCurrency(record.summary.totalNet)}</h3><p style="font-size:12px">Emitido por: ${currentUserData?.name||'Sistema'}</p></div></body></html>`);
+    const w = window.open('', '', 'width=900,height=1000');
+    if(!w)return;
+
+    const cards = paid.map(e => {
+       const h = (e.costHelps||[]).reduce((s,c)=>s+(parseFloat(c.value)||0),0); 
+       const d = e.discounts.reduce((s,k)=>s+(parseFloat(k.value)||0),0); 
+       const n = e.baseSalary + h - d;
+       const helps = (e.costHelps||[]).map(x=>`<div style="display:flex; justify-content:space-between; font-size:12px; color:#10b981; margin-bottom: 4px;"><span>+ ${x.description}</span><strong>${formatCurrency(x.value)}</strong></div>`).join('');
+       const discs = (e.discounts||[]).map(x=>`<div style="display:flex; justify-content:space-between; font-size:12px; color:#ef4444; margin-bottom: 4px;"><span>- ${x.description}</span><strong>${formatCurrency(x.value)}</strong></div>`).join('');
+
+       return `
+         <div style="border: 1px solid #e5e7eb; padding: 25px; border-radius: 16px; margin-bottom: 20px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f3f4f6; padding-bottom: 15px; margin-bottom: 15px;">
+               <div>
+                 <div style="font-weight: 900; font-size: 18px; color: #111;">${e.name}</div>
+                 <div style="font-size: 12px; color: #6b7280; margin-top: 4px; font-weight: 500;">${e.role} • ${e.bank} • <span style="color: #f97316;">PIX: ${e.pix}</span></div>
+               </div>
+               <div style="font-weight: 900; font-size: 20px; color: #111; background: #f3f4f6; padding: 8px 15px; border-radius: 8px;">${formatCurrency(n)}</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+               <div>
+                  <div style="font-size: 11px; font-weight: 800; color: #9ca3af; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Proventos</div>
+                  <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom: 4px; color: #374151;"><span>Salário Base</span><strong>${formatCurrency(e.baseSalary)}</strong></div>
+                  ${helps}
+               </div>
+               <div>
+                  <div style="font-size: 11px; font-weight: 800; color: #9ca3af; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Descontos</div>
+                  ${discs || '<span style="font-size:12px; color:#d1d5db; font-style: italic;">Nenhum desconto aplicado.</span>'}
+               </div>
+            </div>
+         </div>
+       `;
+    }).join('');
+
+    w.document.write(`
+      <html><head><title>Relatório Detalhado</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        body{font-family:'Inter', sans-serif; background: #f9fafb; padding: 60px; color: #1f2937;} 
+        .header{text-align: center; margin-bottom: 50px;} 
+        .logo{font-size: 32px; font-weight: 900; letter-spacing: -1.5px; color: #111;} 
+        .subtitle{font-size: 14px; color: #f97316; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;}
+        .total-box{background: #111; color: white; padding: 30px; border-radius: 20px; text-align: right; margin-top: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);} 
+        .total-label{font-size: 13px; opacity: 0.7; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+        .total-val{font-size: 42px; font-weight: 900; margin-top: 5px; color: #f97316;}
+      </style>
+      </head><body>
+      <div class="header"><div class="logo">FRANKLIN MOTOS</div><div class="subtitle">Relatório Detalhado • ${record.month}/2025</div></div>
+      ${cards}
+      <div class="total-box"><div class="total-label">Investimento Total em Pessoal</div><div class="total-val">${formatCurrency(record.summary.totalNet)}</div></div>
+      </body></html>
+    `);
     w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
   };
 
-  // Impressão Individual (NOVA com Assinatura)
+  // 3. Recibo Individual (Estilo Holerite Premium)
   const printIndividual = (emp) => {
     if (!emp.isPaid15 && !emp.isPaid01) { alert("Este funcionário não possui pagamentos confirmados neste fechamento."); return; }
     const record = selectedRecord; const w = window.open('', '', 'width=800,height=900'); if(!w)return;
     const h = (emp.costHelps||[]).reduce((s,c)=>s+(parseFloat(c.value)||0),0); const d = emp.discounts.reduce((s,k)=>s+(parseFloat(k.value)||0),0); const n = emp.baseSalary+h-d;
-    const hr = (emp.costHelps||[]).map(x=>`<tr><td>${x.description}</td><td style="text-align:right;color:green">${formatCurrency(x.value)}</td></tr>`).join('');
-    const dr = (emp.discounts||[]).map(x=>`<tr><td>${x.description}</td><td style="text-align:right;color:red">-${formatCurrency(x.value)}</td></tr>`).join('');
-    w.document.write(`<html><head><title>Holerite - ${emp.name}</title><style>body{font-family:Arial;padding:40px;max-width:800px;margin:0 auto}.header{text-align:center;border-bottom:2px solid #333;padding-bottom:20px;margin-bottom:30px}.info{display:grid;grid-template-columns:1fr 1fr;gap:20px;background:#f9f9f9;padding:20px;border-radius:8px;margin-bottom:30px}.cols{display:flex;gap:20px}.col{flex:1;border:1px solid #eee;padding:15px}table{width:100%}td{padding:5px 0}.total{background:#333;color:white;padding:20px;display:flex;justify-content:space-between;font-weight:bold;margin-top:30px}.sigs{display:flex;justify-content:space-between;margin-top:80px}.line{width:40%;border-top:1px solid #000;text-align:center;padding-top:10px;font-size:12px}</style></head><body><div class="header"><h1>FRANKLIN MOTOS</h1><p>RECIBO DE PAGAMENTO DE SALÁRIO</p></div><div class="info"><div><strong>Funcionário:</strong> ${emp.name}<br><strong>Cargo:</strong> ${emp.role}</div><div><strong>Referência:</strong> ${record.month}/2025<br><strong>Data Emissão:</strong> ${new Date().toLocaleDateString()}</div></div><div class="cols"><div class="col"><h4 style="color:green;margin-top:0">PROVENTOS</h4><table><tr><td>Salário Base</td><td style="text-align:right">${formatCurrency(emp.baseSalary)}</td></tr>${hr}</table></div><div class="col"><h4 style="color:red;margin-top:0">DESCONTOS</h4><table>${dr}</table></div></div><div class="total"><span>LÍQUIDO A RECEBER</span><span>${formatCurrency(n)}</span></div><div class="sigs"><div class="line">FRANKLIN MOTOS<br>Empregador (Assinatura)</div><div class="line">${emp.name}<br>Funcionário (Assinatura)</div></div><div style="text-align:center;font-size:10px;color:#999;margin-top:40px">Emitido por: ${currentUserData?.name||'Sistema'}</div></body></html>`);
+    const items = [...(emp.costHelps||[]).map(x=>({d:x.description, v:x.value, t:'C'})), ...(emp.discounts||[]).map(x=>({d:x.description, v:x.value, t:'D'}))];
+    
+    const rows = items.map(i => `
+      <tr style="border-bottom: 1px dashed #e5e7eb;">
+        <td style="padding: 12px 0; color: #4b5563;">${i.d}</td>
+        <td style="text-align:right; font-weight: 600; color:${i.t==='C'?'#059669':'#ef4444'};">${i.t==='D'?'-':'+'} ${formatCurrency(i.v)}</td>
+      </tr>
+    `).join('');
+
+    w.document.write(`
+      <html><head><title>Holerite - ${emp.name}</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&display=swap');
+        body{font-family:'Inter',sans-serif; padding:60px; max-width:800px; margin:0 auto; color:#111; background-color: #fff;} 
+        .box{border: 2px solid #f3f4f6; padding: 40px; position:relative; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.05);} 
+        .header{text-align:center; border-bottom: 2px solid #f97316; padding-bottom: 30px; margin-bottom: 30px;} 
+        .logo{font-size:32px; font-weight:900; letter-spacing:-1.5px; color: #111;} 
+        .doc-title{font-size: 14px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 2px; margin-top: 5px;}
+        .info-grid {display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;}
+        .info-item {background: #f9fafb; padding: 15px; border-radius: 12px;}
+        .label {font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;}
+        .value {font-size: 14px; font-weight: 600; color: #1f2937;}
+        table{width:100%; border-collapse:collapse; font-size:13px; margin-bottom: 30px;} 
+        th{text-align:left; border-bottom: 2px solid #e5e7eb; padding: 10px 0; color: #9ca3af; font-weight: 700; text-transform: uppercase; font-size: 11px;} 
+        .total{background: #111; color: white; padding: 25px; border-radius: 16px; display:flex; justify-content:space-between; align-items:center;} 
+        .total-label {font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
+        .total-val{font-size:32px; font-weight:900; color: #f97316;} 
+        .sigs{display:flex; justify-content:space-between; margin-top:80px; font-size:11px; text-transform:uppercase; color: #6b7280; font-weight: 600;} 
+        .line{width:45%; border-top:1px solid #d1d5db; padding-top:10px;}
+        .watermark {position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 100px; font-weight: 900; color: rgba(0,0,0,0.03); z-index: 0; pointer-events: none;}
+      </style>
+      </head><body>
+      <div class="box">
+        <div class="watermark">FRANKLIN</div>
+        <div class="header"><div class="logo">FRANKLIN MOTOS</div><div class="doc-title">Recibo de Pagamento</div></div>
+        
+        <div class="info-grid">
+          <div class="info-item"><div class="label">Colaborador</div><div class="value">${emp.name}</div><div class="label" style="margin-top: 5px;">Cargo</div><div class="value">${emp.role}</div></div>
+          <div class="info-item"><div class="label">Referência</div><div class="value">${record.month}/2025</div><div class="label" style="margin-top: 5px;">Chave PIX</div><div class="value" style="font-family: monospace;">${emp.pix}</div></div>
+        </div>
+
+        <table>
+          <thead><tr><th>Descrição</th><th style="text-align:right">Valor (R$)</th></tr></thead>
+          <tbody>
+            <tr style="border-bottom: 1px dashed #e5e7eb;"><td style="padding:12px 0;">Salário Base</td><td style="text-align:right; font-weight: 600;">${formatCurrency(emp.baseSalary)}</td></tr>
+            ${rows}
+          </tbody>
+        </table>
+
+        <div class="total"><div class="total-label">Líquido a Receber</div><div class="total-val">${formatCurrency(n)}</div></div>
+
+        <div class="sigs">
+          <div class="line" style="text-align:left">Franklin Motos<br>Empregador</div>
+          <div class="line" style="text-align:right">${emp.name}<br>Funcionário</div>
+        </div>
+      </div>
+      <div style="text-align:center; font-size:10px; color:#9ca3af; margin-top:30px">Documento gerado eletronicamente em ${new Date().toLocaleDateString()}. Válido como comprovante de renda.</div>
+      </body></html>
+    `);
     w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
   };
 
@@ -708,7 +842,7 @@ const App = () => {
                 <button onClick={printSimplified} className="flex flex-col items-center justify-center p-6 border-2 border-gray-100 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition-all group"><FileText size={32} className="text-gray-400 group-hover:text-orange-500 mb-3" /><span className="font-bold text-gray-700 group-hover:text-orange-600">Geral Simplificado</span><span className="text-xs text-gray-400 mt-1">Lista básica de valores</span></button>
                 <button onClick={printDetailed} className="flex flex-col items-center justify-center p-6 border-2 border-gray-100 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"><List size={32} className="text-gray-400 group-hover:text-blue-500 mb-3" /><span className="font-bold text-gray-700 group-hover:text-blue-600">Geral Detalhado</span><span className="text-xs text-gray-400 mt-1">Completo com Bancos e Descontos</span></button>
               </div>
-              <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Recibos Individuais (Holerites)</h4>
+              <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Recibos Individuais</h4>
               <div className="space-y-2">
                 {selectedRecord.data.map(emp => (
                   <div key={emp.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
@@ -749,6 +883,24 @@ const App = () => {
             
             {activeTab === 'panel' ? (
                <>
+                 {/* Novo Seletor de Meses para o Painel Atual */}
+                 <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-6">
+                    {MONTHS.map(month => (
+                      <button 
+                        key={month} 
+                        onClick={() => setCurrentMonth(month)}
+                        className={`
+                          px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap
+                          ${currentMonth === month 
+                            ? 'bg-gray-900 text-white shadow-lg' 
+                            : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50'}
+                        `}
+                      >
+                        {month}
+                      </button>
+                    ))}
+                 </div>
+
                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">{[{ label: 'Total Bruto', value: summary.totalBase, color: 'text-gray-900' }, { label: 'Total Ajuda', value: summary.totalExtras, color: 'text-green-600' }, { label: 'Descontos Totais', value: summary.totalDeductions, color: 'text-red-500' }, { label: 'Líquido Total', value: summary.totalNet, color: 'text-gray-900', isBold: true }].map((stat, idx) => (<div key={idx} className="bg-white/70 backdrop-blur-lg p-5 rounded-2xl border border-white/50 shadow-sm hover:shadow-md transition-shadow"><p className="text-xs text-gray-400 uppercase font-medium tracking-wide mb-1">{stat.label}</p><h3 className={`text-2xl ${stat.isBold ? 'font-bold' : 'font-semibold'} ${stat.color}`}>{formatCurrency(stat.value)}</h3></div>))}</div>
                  <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/70 backdrop-blur-lg p-2 rounded-2xl border border-white/50 shadow-sm"><div className="flex gap-1 w-full md:w-auto overflow-x-auto">{[{ id: 'all', label: 'Todos', icon: Users }, { id: 'mecanico', label: 'Mecânicos', icon: Wrench }, { id: 'adm', label: 'Adm', icon: Briefcase }].map(filter => (<button key={filter.id} onClick={() => setFilterType(filter.id)} className={`px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap ${filterType === filter.id ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}><filter.icon size={14} />{filter.label}</button>))}</div><div className="relative w-full md:w-72"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" /><input type="text" placeholder="Buscar funcionário..." className="w-full pl-10 pr-4 py-2 bg-gray-50/50 border border-transparent rounded-xl focus:bg-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all text-sm outline-none" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>
                  <div className="space-y-4">{filteredEmployees.map((emp) => (<EmployeeCard key={emp.id} emp={emp} addCostHelp={addCostHelp} removeCostHelp={removeCostHelp} updateCostHelp={updateCostHelp} addDiscount={addDiscount} removeDiscount={removeDiscount} updateDiscount={updateDiscount} togglePaid={togglePaid} handleUpload={handleUpload} removeReceipt={removeReceipt} copyToClipboard={copyToClipboard} copyFeedback={copyFeedback} />))}</div>
